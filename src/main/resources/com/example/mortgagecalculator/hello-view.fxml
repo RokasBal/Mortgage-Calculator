@@ -1,16 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
 
-<?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.mortgagecalculator.HelloController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
-
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="928.0" prefWidth="1656.0" styleClass="background-style" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mortgagecalculator.Controller">
+   <children>
+      <AnchorPane layoutX="25.0" layoutY="25.0" prefHeight="873.0" prefWidth="958.0" styleClass="input-container-style" stylesheets="@style.css" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="25.0">
+         <children>
+            <TextFlow prefHeight="79.0" prefWidth="958.0" styleClass="title-text-box" textAlignment="CENTER" AnchorPane.bottomAnchor="789.0" AnchorPane.topAnchor="10.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title-text" text="Enter your information" textAlignment="CENTER" translateY="15.0" wrappingWidth="1470.7979736328125">
+                     <font>
+                        <Font size="38.0" />
+                     </font>
+                  </Text>
+               </children>
+            </TextFlow>
+            <TextField layoutX="49.0" layoutY="166.0" prefHeight="52.0" prefWidth="380.0" text="\$" />
+            <TextFlow layoutX="49.0" layoutY="132.0" prefHeight="26.0" prefWidth="380.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="options-text" text="Amount to loan">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Text>
+               </children>
+            </TextFlow>
+            <TextFlow layoutX="479.0" layoutY="132.0" prefHeight="26.0" prefWidth="380.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="options-text" text="Loan term">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Text>
+               </children>
+            </TextFlow>
+            <DatePicker layoutX="479.0" layoutY="166.0" prefHeight="52.0" prefWidth="380.0" />
+            <ChoiceBox fx:id="graphSelectionBox" layoutX="479.0" layoutY="264.0" prefHeight="52.0" prefWidth="380.0" value="Annuity"/>
+            <TextFlow layoutX="49.0" layoutY="264.0" prefHeight="52.0" prefWidth="380.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="options-text" text="Choose graph type:" translateY="5.0" wrappingWidth="286.1759948730469">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Text>
+               </children>
+            </TextFlow>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="997.0" layoutY="41.0" prefHeight="866.0" prefWidth="629.0" styleClass="input-container-style" stylesheets="@style.css" AnchorPane.bottomAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="25.0" />
+   </children>
+</AnchorPane>

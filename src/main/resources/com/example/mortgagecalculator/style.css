@@ -1,0 +1,25 @@
+.background-style {
+    -fx-background-color: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+    /*-fx-background-image: url("gggrain.svg");*/
+    /*-fx-background-position: center;*/
+    /*-fx-background-repeat: no-repeat;*/
+    /*-fx-background-size: cover;*/
+}
+
+.input-container-style {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+}
+
+.title-text-box {
+}
+
+.title-text {
+    -fx-font-family: "Google Sans";
+    -fx-font-weight: 700;
+}
+
+.options-text {
+    -fx-font-family: "Google Sans";
+    -fx-font-weight: 500;
+}
