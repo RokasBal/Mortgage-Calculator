@@ -33,6 +33,8 @@ public class Controller implements Initializable {
     public static float loanAmountInput;
     public static float interestRateInput;
 
+    private double monthlyPayment;
+
     /**
      * Choice boxes
      */
@@ -66,8 +68,8 @@ public class Controller implements Initializable {
 
 //    @FXML
 //    public LineChart annuityGraph;
-    @FXML
-    public LineChart linearGraph;
+//    @FXML
+//    public LineChart linearGraph;
     @FXML
     private TableView<tableData> monthlyTable;
 //    @FXML
@@ -82,12 +84,17 @@ public class Controller implements Initializable {
     private TableColumn<tableData, Float> monthlyPaymentCol;
     @FXML
     private TableColumn<tableData, Float> balanceLeftCol;
+    @FXML
+    private TableColumn<tableData, Float> interestCol;
 
     private ObservableList<tableData> dataList = FXCollections.observableArrayList();
 
     @FXML
     private LineChart<Number, Number> annuityGraph;
-    private final XYChart.Series<Number, Number> series = new XYChart.Series<>();
+    @FXML
+    private LineChart<Number, Number> linearGraph;
+    private final XYChart.Series<Number, Number> linearSeries = new XYChart.Series<>();
+    private final XYChart.Series<Number, Number> annuitySeries = new XYChart.Series<>();
 
     /**
      * Declaring available loan types to choose from.
@@ -129,7 +136,7 @@ public class Controller implements Initializable {
             annuityGraph.setVisible(false);
             linearGraph.setVisible(false);
         }
-        fillTable();
+        fillData();
         System.out.println("AA");
     }
 
@@ -225,7 +232,7 @@ public class Controller implements Initializable {
     }
 
     private void displayTableAndGraph(ActionEvent actionEvent) {
-        fillTable();
+        fillData();
         monthlyTable.setVisible(true);
         if(selectedGraph.equals("Annuity")) {
             annuityGraph.setVisible(true);
@@ -240,43 +247,68 @@ public class Controller implements Initializable {
     private void initializeTable() {
         monthCol.setCellValueFactory(new PropertyValueFactory<>("month"));
         monthlyPaymentCol.setCellValueFactory(new PropertyValueFactory<>("monthlyPayment"));
+        interestCol.setCellValueFactory(new PropertyValueFactory<>("interestPayment"));
         balanceLeftCol.setCellValueFactory(new PropertyValueFactory<>("remainingBalance"));
         monthlyTable.setItems(dataList);
     }
-    public void fillTable() {
+    public void fillData() {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        series.getData().clear();
+        linearSeries.getData().clear();
+        annuitySeries.getData().clear();
         dataList.removeAll(dataList);
+        annuityGraph.getData().add(annuitySeries);
+        linearGraph.getData().add(linearSeries);
+        String monthlyPaymentRoundedString;
 
         int term = Calculations.monthsToRepay();
-        float loan = Calculations.totalLoanAmount();
-        String balance = decimalFormat.format(loanAmountInput);
-        remainingBalance = Float.parseFloat(balance);
+        remainingBalance = loanAmountInput;
         double monthlyInterestRate = interestRateInput / 1200;
-        double monthlyPayment = (loanAmountInput * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -term));
+
+        if(selectedGraph.equals("Annuity")) {
+            monthlyPayment = (loanAmountInput * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -term));
+        } else {
+            monthlyPayment = (loanAmountInput / term) + (loanAmountInput * monthlyInterestRate);
+        }
 
         for (int i = 0; i < term; i++) {
             double interestPayment = remainingBalance * monthlyInterestRate;
-            double balanceLeft = monthlyPayment - interestPayment;
+            double principalPayment;
 
-            String monthlyPaymentRoundedString = decimalFormat.format(monthlyPayment);
-            String balanceLeftRoundedString = decimalFormat.format(balanceLeft);
+            if(selectedGraph.equals("Linear")) {
+//                monthlyPayment = (loanAmountInput / term) + (remainingBalance * monthlyInterestRate);
+//                remainingBalance = loanAmountInput - (loanAmountInput / term) * (i + 1);
+                principalPayment = loanAmountInput / term;
+            } else {
+//                remainingBalance = loanAmountInput * ((1 - Math.pow((1 + monthlyInterestRate), -(i + 1))) / monthlyInterestRate);
+                principalPayment = monthlyPayment - interestPayment;
+            }
+
+            remainingBalance -= principalPayment;
+
+            if(selectedGraph.equals("Linear")) {
+                monthlyPaymentRoundedString = decimalFormat.format(principalPayment + interestPayment);
+            } else monthlyPaymentRoundedString = decimalFormat.format(monthlyPayment);
+
+            String interestPaymentRoundedString = decimalFormat.format(interestPayment);
             float monthlyPaymentRounded = Float.parseFloat(monthlyPaymentRoundedString);
-            float balanceLeftRounded = Float.parseFloat(balanceLeftRoundedString);
+            float interestPaymentRounded = Float.parseFloat(interestPaymentRoundedString);
 
-            remainingBalance -= balanceLeftRounded;
-            if(remainingBalance < 1) remainingBalance = 0;
+            String remainingBalanceRoundedString = decimalFormat.format(remainingBalance);
+            float remainingBalanceRounded = Float.parseFloat(remainingBalanceRoundedString);
+            if(remainingBalance < 0.01) remainingBalance = 0;
 
-            System.out.println("Month: " + (i + 1) + " Payment: " + monthlyPayment + " Remaining balance: " + remainingBalance);
+//            System.out.println("Month: " + (i + 1) + " Payment: " + monthlyPayment + " Remaining balance: " + remainingBalance);
 
-            tableData newData = new tableData(i + 1, (float) monthlyPaymentRounded, (float) remainingBalance);
+            tableData newData = new tableData(i + 1, monthlyPaymentRounded, interestPaymentRounded, remainingBalanceRounded);
             dataList.add(newData);
             monthlyTable.setItems(dataList);
             monthlyTable.refresh();
 
-            series.getData().add(new XYChart.Data<>(i, monthlyPaymentRounded));
+            annuitySeries.getData().add(new XYChart.Data<>(i, monthlyPaymentRounded));
+            linearSeries.getData().add(new XYChart.Data<>(i, monthlyPaymentRounded));
         }
 
-        annuityGraph.getData().add(series);
+        annuityGraph.getData().add(annuitySeries);
+        linearGraph.getData().add(linearSeries);
     }
 }

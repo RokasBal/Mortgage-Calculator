@@ -20,23 +20,4 @@ public class Calculations {
         return loanAmount;
     }
 
-//    public static void fillTable() {
-//        monthsToRepay();
-//        totalLoanAmount();
-//        float payment = 0;
-//        float interestRate = 0;
-//        float remainingBalance = 0;
-//        if (Controller.selectedGraph == "Annuity") {
-//            payment = (float) (loanAmount * (Controller.interestRateInput / 12) / (1 - Math.pow(1 + Controller.interestRateInput / 12, -loanTerm)));
-//            interestRate = Controller.interestRateInput;
-//            remainingBalance = loanAmount - payment;
-//        } else {
-//            for (int i = 0; i < loanTerm; i++) {
-//            }
-//        }
-//        ObservableList<tableData> data = FXCollections.observableArrayList(
-//                new tableData(payment, interestRate, remainingBalance));
-//        Controller.monthlyTable.setItems(data);
-//    }
-
 }
