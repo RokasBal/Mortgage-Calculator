@@ -6,5 +6,6 @@ module com.example.mortgagecalculator {
     requires com.dlsc.formsfx;
 
     opens com.example.mortgagecalculator to javafx.fxml;
+    opens Utility to javafx.base;
     exports com.example.mortgagecalculator;
 }
