@@ -21,10 +21,10 @@
          <children>
             <LineChart fx:id="annuityGraph" layoutX="649.0" layoutY="69.0" prefHeight="661.0" prefWidth="1088.0" visible="false">
               <xAxis>
-                <CategoryAxis side="BOTTOM" />
+                <NumberAxis side="BOTTOM" fx:id="annuityMonthAxis" />
               </xAxis>
               <yAxis>
-                <NumberAxis side="LEFT" />
+                <NumberAxis fx:id="annuityPaymentAxis" side="LEFT" />
               </yAxis>
             </LineChart>
             <TableView fx:id="monthlyTable" layoutX="48.0" layoutY="69.0" prefHeight="638.0" prefWidth="579.0" visible="false">
@@ -35,10 +35,10 @@
                </columns></TableView>
             <LineChart fx:id="linearGraph" layoutX="649.0" layoutY="69.0" prefHeight="661.0" prefWidth="1098.0" visible="false">
                <xAxis>
-                  <CategoryAxis side="BOTTOM" />
+                  <NumberAxis side="BOTTOM" fx:id="monthAxis" />
                </xAxis>
                <yAxis>
-                  <NumberAxis side="LEFT" />
+                  <NumberAxis fx:id="paymentAxis" side="LEFT" />
                </yAxis>
             </LineChart>
          </children>
@@ -101,7 +101,7 @@
                   <Font size="18.0" />
                </font>
             </Text>
-            <Button fx:id="displayButton" layoutX="49.0" layoutY="245.0" mnemonicParsing="false" prefHeight="52.0" prefWidth="380.0" text="Button" />
+            <Button fx:id="generateData" layoutX="49.0" layoutY="245.0" mnemonicParsing="false" prefHeight="52.0" prefWidth="380.0" text="Button" />
          </children>
       </AnchorPane>
    </children>

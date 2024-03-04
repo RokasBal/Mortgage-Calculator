@@ -8,9 +8,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Font;
+import org.controlsfx.control.action.Action;
 
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -22,7 +26,6 @@ import java.util.function.UnaryOperator;
 import static java.lang.Math.pow;
 
 public class Controller implements Initializable {
-
     public static String selectedGraph;
 
     public static int loanTermYearInput;
@@ -59,9 +62,10 @@ public class Controller implements Initializable {
 
     @FXML
     private Button saveToFileButton;
+    @FXML Button generateData;
 
-    @FXML
-    public LineChart annuityGraph;
+//    @FXML
+//    public LineChart annuityGraph;
     @FXML
     public LineChart linearGraph;
     @FXML
@@ -80,6 +84,10 @@ public class Controller implements Initializable {
     private TableColumn<tableData, Float> balanceLeftCol;
 
     private ObservableList<tableData> dataList = FXCollections.observableArrayList();
+
+    @FXML
+    private LineChart<Number, Number> annuityGraph;
+    private final XYChart.Series<Number, Number> series = new XYChart.Series<>();
 
     /**
      * Declaring available loan types to choose from.
@@ -161,9 +169,15 @@ public class Controller implements Initializable {
         }));
     }
 
+    public void fillAnnuityGraph() {
+//        series.getData().add(new XYChart.Data<>(0, loanAmountInput));
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeTable();
+
+        generateData.setOnAction(this::displayTableAndGraph);
 
         // Adding graph types to the choice box.
         loanType.getItems().addAll(loanTypes);
@@ -210,6 +224,18 @@ public class Controller implements Initializable {
         loanTermMonth.setOnAction(this::getLoanTermMonthInput);
     }
 
+    private void displayTableAndGraph(ActionEvent actionEvent) {
+        fillTable();
+        monthlyTable.setVisible(true);
+        if(selectedGraph.equals("Annuity")) {
+            annuityGraph.setVisible(true);
+            linearGraph.setVisible(false);
+        } else if(selectedGraph.equals("Linear")) {
+            annuityGraph.setVisible(false);
+            linearGraph.setVisible(true);
+        }
+    }
+
 
     private void initializeTable() {
         monthCol.setCellValueFactory(new PropertyValueFactory<>("month"));
@@ -219,6 +245,8 @@ public class Controller implements Initializable {
     }
     public void fillTable() {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        series.getData().clear();
+        dataList.removeAll(dataList);
 
         int term = Calculations.monthsToRepay();
         float loan = Calculations.totalLoanAmount();
@@ -245,6 +273,10 @@ public class Controller implements Initializable {
             dataList.add(newData);
             monthlyTable.setItems(dataList);
             monthlyTable.refresh();
+
+            series.getData().add(new XYChart.Data<>(i, monthlyPaymentRounded));
         }
+
+        annuityGraph.getData().add(series);
     }
 }
