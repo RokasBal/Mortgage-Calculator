@@ -8,6 +8,10 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Main class to start the JavaFX app.
+ * @author Rokas Baliutavičius
+ */
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {

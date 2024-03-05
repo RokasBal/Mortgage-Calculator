@@ -1,12 +1,16 @@
 package Utility;
 
-public class tableData {
+/**
+ * Class utilized for storing
+ */
+
+public class TableData {
     public int month;
     public float monthlyPayment;
     public float interestPayment;
     public float remainingBalance;
 
-    public tableData(int month, float monthlyPayment, float interestPayment, float remainingBalance) {
+    public TableData(int month, float monthlyPayment, float interestPayment, float remainingBalance) {
         this.month = month;
         this.monthlyPayment = monthlyPayment;
         this.interestPayment = interestPayment;

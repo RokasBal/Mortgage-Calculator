@@ -4,6 +4,7 @@ module com.example.mortgagecalculator {
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
+    requires com.opencsv;
 
     opens com.example.mortgagecalculator to javafx.fxml;
     opens Utility to javafx.base;

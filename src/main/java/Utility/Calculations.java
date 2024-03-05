@@ -4,7 +4,7 @@ import com.example.mortgagecalculator.Controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import static Utility.tableData.*;
+import static Utility.TableData.*;
 
 public class Calculations {
 
