@@ -1,6 +1,7 @@
 package com.example.mortgagecalculator;
 
 import Utility.Calculations;
+import Utility.UserInput;
 import Utility.tableData;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,6 +34,11 @@ public class Controller implements Initializable {
     public static float loanAmountInput;
     public static float interestRateInput;
 
+    public int delayYearStartInput;
+    public int delayYearEndInput;
+    public int delayMonthStartInput;
+    public int delayMonthEndInput;
+
     private double monthlyPayment;
 
     /**
@@ -44,13 +50,21 @@ public class Controller implements Initializable {
     private ChoiceBox<String> displaySelection;
 
     @FXML
-    private TextField loanAmount;
+    protected TextField loanAmount;
     @FXML
     private TextField interestRate;
     @FXML
     private TextField loanTermYear;
     @FXML
     private TextField loanTermMonth;
+    @FXML
+    private TextField delayYearStart;
+    @FXML
+    private TextField delayMonthStart;
+    @FXML
+    private TextField delayYearEnd;
+    @FXML
+    private TextField delayMonthEnd;
 
     @FXML
     private Slider filterStart;
@@ -66,18 +80,9 @@ public class Controller implements Initializable {
     private Button saveToFileButton;
     @FXML Button generateData;
 
-//    @FXML
-//    public LineChart annuityGraph;
-//    @FXML
-//    public LineChart linearGraph;
+
     @FXML
     private TableView<tableData> monthlyTable;
-//    @FXML
-//    public static TableColumn<tableData, Integer> monthCol = new TableColumn<>("Month");
-//    @FXML
-//    public static TableColumn<tableData, Float> monthlyPaymentCol = new TableColumn<>("Monthly payment");
-//    @FXML
-//    public static TableColumn<tableData, Float> balanceLeftCol = new TableColumn<>("Balance left");
     @FXML
     private TableColumn<tableData, Integer> monthCol;
     @FXML
@@ -100,7 +105,6 @@ public class Controller implements Initializable {
      * Declaring available loan types to choose from.
      */
     private String[] loanTypes = {"Annuity", "Linear"};
-    private String[] displayTypes = {"Graph", "Payment table"};
     double remainingBalance;
 
     private void refreshGraphs() {
@@ -137,7 +141,6 @@ public class Controller implements Initializable {
             linearGraph.setVisible(false);
         }
         fillData();
-        System.out.println("AA");
     }
 
     public void getLoanAmountInput(ActionEvent event) {
@@ -176,10 +179,6 @@ public class Controller implements Initializable {
         }));
     }
 
-    public void fillAnnuityGraph() {
-//        series.getData().add(new XYChart.Data<>(0, loanAmountInput));
-    }
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeTable();
@@ -189,14 +188,15 @@ public class Controller implements Initializable {
         // Adding graph types to the choice box.
         loanType.getItems().addAll(loanTypes);
         loanType.setOnAction(this::getLoanTypeSelection);
-//        displaySelection.getItems().addAll(displayTypes);
-//        displaySelection.setOnAction(this::getDisplaySelection);
-
-//        Font.loadFont(getClass().getResourceAsStream("resources/com.example.mortgagecalculator/Satoshi-Variable.ttf"), 14);
 
         // Setting up filter to only allow float values to be entered in the text field.
         formatToFloat(loanAmount);
         loanAmount.setOnAction(this::getLoanAmountInput);
+
+        delayYearStart.setOnAction(this::getDelayYearStart);
+        delayMonthStart.setOnAction(this::getDelayMonthStart);
+        delayYearEnd.setOnAction(this::getDelayYearEnd);
+        delayMonthEnd.setOnAction(this::getDelayMonthEnd);
 
         formatToFloat(interestRate);
         interestRate.setOnAction(this::getInterestRateInput);
@@ -229,6 +229,26 @@ public class Controller implements Initializable {
             }
         }));
         loanTermMonth.setOnAction(this::getLoanTermMonthInput);
+    }
+
+    private void getDelayMonthEnd(ActionEvent actionEvent) {
+        delayMonthEndInput = Integer.parseInt(delayMonthEnd.getText());
+        System.out.println("Delay month end: " + delayMonthEndInput);
+    }
+
+    private void getDelayYearEnd(ActionEvent actionEvent) {
+        delayYearEndInput = Integer.parseInt(delayYearEnd.getText());
+        System.out.println("Delay year end: " + delayYearEndInput);
+    }
+
+    private void getDelayMonthStart(ActionEvent actionEvent) {
+        delayMonthStartInput = Integer.parseInt(delayMonthStart.getText());
+        System.out.println("Delay month start: " + delayMonthStartInput);
+    }
+
+    private void getDelayYearStart(ActionEvent actionEvent) {
+        delayYearStartInput = Integer.parseInt(delayYearStart.getText());
+        System.out.println("Delay year start: " + delayYearStartInput);
     }
 
     private void displayTableAndGraph(ActionEvent actionEvent) {
@@ -265,7 +285,7 @@ public class Controller implements Initializable {
         double monthlyInterestRate = interestRateInput / 1200;
 
         if(selectedGraph.equals("Annuity")) {
-            monthlyPayment = (loanAmountInput * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -term));
+            monthlyPayment = (loanAmountInput * monthlyInterestRate) / (1 - pow(1 + monthlyInterestRate, -term));
         } else {
             monthlyPayment = (loanAmountInput / term) + (loanAmountInput * monthlyInterestRate);
         }
@@ -275,11 +295,8 @@ public class Controller implements Initializable {
             double principalPayment;
 
             if(selectedGraph.equals("Linear")) {
-//                monthlyPayment = (loanAmountInput / term) + (remainingBalance * monthlyInterestRate);
-//                remainingBalance = loanAmountInput - (loanAmountInput / term) * (i + 1);
                 principalPayment = loanAmountInput / term;
             } else {
-//                remainingBalance = loanAmountInput * ((1 - Math.pow((1 + monthlyInterestRate), -(i + 1))) / monthlyInterestRate);
                 principalPayment = monthlyPayment - interestPayment;
             }
 
