@@ -8,12 +8,14 @@ public class TableData {
     public int month;
     public float monthlyPayment;
     public float interestPayment;
-    public float remainingBalance;
+    public float totalInterest;
 
-    public TableData(int month, float monthlyPayment, float interestPayment, float remainingBalance) {
+    public float remainingBalance;
+    public TableData(int month, float monthlyPayment, float interestPayment, float totalInterest, float remainingBalance) {
         this.month = month;
         this.monthlyPayment = monthlyPayment;
         this.interestPayment = interestPayment;
+        this.totalInterest = totalInterest;
         this.remainingBalance = remainingBalance;
     }
 
@@ -27,6 +29,9 @@ public class TableData {
 
     public float getRemainingBalance() {
         return remainingBalance;
+    }
+    public float getTotalInterest() {
+        return totalInterest;
     }
     public float getInterestPayment() {
         return interestPayment;

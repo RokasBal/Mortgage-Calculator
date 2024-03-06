@@ -8,7 +8,6 @@ public class UserInput extends Controller {
 //    public boolean tableDrawn = false;
 
     public UserInput() {
-
     }
     public void handleLoanAmountInput(ActionEvent event, TextField loanAmountField) {
         loanAmountInput = Float.parseFloat(loanAmount.getText());

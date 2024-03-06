@@ -47,8 +47,8 @@ public class Setup extends Controller {
     }
 
     public void calculatePostpone() {
-        totalDelay = (delayYearEndInput - delayYearStartInput) * 12 + (delayMonthEndInput - delayMonthStartInput);
-        delayStartMonth = delayYearStartInput * 12 + delayMonthStartInput;
-        delayEndMonth = delayYearEndInput * 12 + delayMonthEndInput;
+//        Controller.totalDelay = (delayYearEndInput - delayYearStartInput) * 12 + (delayMonthEndInput - delayMonthStartInput);
+//        delayStartMonth = delayYearStartInput * 12 + delayMonthStartInput;
+//        delayEndMonth = delayYearEndInput * 12 + delayMonthEndInput;
     }
 }

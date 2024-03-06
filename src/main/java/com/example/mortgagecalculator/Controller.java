@@ -30,9 +30,9 @@ public class Controller implements Initializable {
     private int startDate;
     private int endDate;
 
-    protected int totalDelay;
-    protected int delayStartMonth;
-    protected int delayEndMonth;
+    public int totalDelay;
+    public int delayStartMonth;
+    public int delayEndMonth;
 
     public int delayYearStartInput = 0;
     public int delayYearEndInput = 0;
@@ -81,6 +81,8 @@ public class Controller implements Initializable {
     private TableColumn<TableData, Float> balanceLeftCol;
     @FXML
     private TableColumn<TableData, Float> interestCol;
+    @FXML
+    private TableColumn<TableData, Float> totalInterestCol;
 
     private ObservableList<TableData> dataList = FXCollections.observableArrayList();
 
@@ -153,6 +155,8 @@ public class Controller implements Initializable {
      * Primary method for this program, calculating both graph types and displaying them within the table and graph.
      */
     public void fillData() {
+        float totalInterest = 0;
+
         // Declaring that the visualization has been rendered at least once, allowing other functions to call this method.
         tableDrawn = true;
         // Clearing the graph and table data to avoid overlap.
@@ -160,7 +164,10 @@ public class Controller implements Initializable {
 
         // Getting payment delay information.
         Setup setup = new Setup();
-        setup.calculatePostpone();
+        totalDelay = (delayYearEndInput - delayYearStartInput) * 12 + (delayMonthEndInput - delayMonthStartInput);
+        delayStartMonth = delayYearStartInput * 12 + delayMonthStartInput;
+        delayEndMonth = delayYearEndInput * 12 + delayMonthEndInput;
+        System.out.println("Total delay: " + totalDelay + ", Delay start month: " + delayStartMonth + ", Delay end month: " + delayEndMonth);
 
         // Calculating the total length of time over which the mortgage needs to be repaid in months.
         int term = Calculations.monthsToRepay();
@@ -185,6 +192,13 @@ public class Controller implements Initializable {
             float interestPaymentRounded;
             float remainingBalanceRounded;
             float monthlyPaymentRounded;
+
+            if(filterStart.getValue() > 0) {
+                for(int x = 0; x < i; x++) {
+                    System.out.println("Remaining balance: " + remainingBalance + "i: " + i);
+                    remainingBalance -= principalPayment;
+                }
+            }
 
             // Checking if current month is inside a postpone period.
             if(i >= delayStartMonth && i < delayEndMonth) {
@@ -218,7 +232,10 @@ public class Controller implements Initializable {
             interestPaymentRounded = ModifyInput.roundInput(interestPayment);
             remainingBalanceRounded = ModifyInput.roundInput(remainingBalance);
 
-            TableData newData = new TableData(i, monthlyPaymentRounded, interestPaymentRounded, remainingBalanceRounded);
+            totalInterest += interestPaymentRounded;
+            float totalInterestRounded = ModifyInput.roundInput(totalInterest);
+
+            TableData newData = new TableData(i, monthlyPaymentRounded, interestPaymentRounded, totalInterestRounded, remainingBalanceRounded);
             dataList.add(newData);
             monthlyTable.setItems(dataList);
             monthlyTable.refresh();
@@ -322,6 +339,7 @@ public class Controller implements Initializable {
         monthCol.setCellValueFactory(new PropertyValueFactory<>("month"));
         monthlyPaymentCol.setCellValueFactory(new PropertyValueFactory<>("monthlyPayment"));
         interestCol.setCellValueFactory(new PropertyValueFactory<>("interestPayment"));
+        totalInterestCol.setCellValueFactory(new PropertyValueFactory<>("totalInterest"));
         balanceLeftCol.setCellValueFactory(new PropertyValueFactory<>("remainingBalance"));
         monthlyTable.setItems(dataList);
     }

@@ -27,9 +27,10 @@
             <TableView fx:id="monthlyTable" layoutX="48.0" layoutY="69.0" prefHeight="638.0" prefWidth="579.0" visible="false">
                <columns>
                   <TableColumn fx:id="monthCol" prefWidth="75.0" text="Month" />
-                  <TableColumn fx:id="monthlyPaymentCol" prefWidth="156.0" text="Monthly payment" />
-                  <TableColumn fx:id="interestCol" prefWidth="161.0" text="Monthly interest" />
-                  <TableColumn fx:id="balanceLeftCol" prefWidth="169.0" text="Remaining balance" />
+                  <TableColumn fx:id="monthlyPaymentCol" prefWidth="129.0" text="Monthly payment" />
+                  <TableColumn fx:id="interestCol" minWidth="9.0" prefWidth="118.0" text="Monthly interest" />
+                  <TableColumn fx:id="totalInterestCol" minWidth="0.0" prefWidth="127.0" text="Total interest" />
+                  <TableColumn fx:id="balanceLeftCol" maxWidth="192.0" minWidth="0.0" prefWidth="129.0" text="Remaining balance" />
                </columns></TableView>
             <LineChart fx:id="linearGraph" layoutX="649.0" layoutY="69.0" prefHeight="638.0" prefWidth="1098.0" styleClass="graphs" visible="false">
                <xAxis>
@@ -45,7 +46,7 @@
          <children>
             <TextField fx:id="loanAmount" layoutX="49.0" layoutY="115.0" prefHeight="52.0" prefWidth="380.0" promptText="€" />
             <TextField fx:id="interestRate" layoutX="484.0" layoutY="115.0" prefHeight="52.0" prefWidth="380.0" promptText="\%" />
-            <Text fx:id="interestRateLabel" layoutX="484.0" layoutY="96.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="options-text" text="Interest rate">
+            <Text fx:id="interestRateLabel" layoutX="484.0" layoutY="96.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="options-text" text="Yearly interest rate">
                <font>
                   <Font size="18.0" />
                </font>
