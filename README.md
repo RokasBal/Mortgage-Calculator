@@ -10,3 +10,4 @@ A simple mortgage calculator app built with JavaFX for a school project.
 * Ability to choose between annuity and linear mortgage types
 * Ability to filter generated data by time period
 * Ability to declare a time period where payments will be postponned
+* Export generated table data to a .CSV file
