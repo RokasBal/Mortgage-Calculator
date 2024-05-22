@@ -10,13 +10,21 @@ public class Calculations {
 
     public static int loanTerm;
     public static float loanAmount;
-    public static int monthsToRepay() {
-        loanTerm = Controller.loanTermYearInput * 12 + Controller.loanTermMonthInput;
+
+    Controller controller;
+
+    public Calculations(Controller controller) {
+        this.controller = controller;
+    }
+
+    public int monthsToRepay() {
+        loanTerm = controller.loanTermYearInput * 12 + controller.loanTermMonthInput;
+        System.out.println("Term in Calculations: " + loanTerm + " loanTermYearInput: " + controller.loanTermYearInput + " loanTermMonthInput: " + controller.loanTermMonthInput);
         return loanTerm;
     }
 
-    public static float totalLoanAmount() {
-        loanAmount = Controller.loanAmountInput + Controller.loanAmountInput * Controller.interestRateInput * loanTerm;
+    public float totalLoanAmount() {
+        loanAmount = controller.loanAmountInput + controller.loanAmountInput * controller.interestRateInput * loanTerm;
         return loanAmount;
     }
 

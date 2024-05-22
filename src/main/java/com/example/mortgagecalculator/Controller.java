@@ -85,6 +85,7 @@ public class Controller implements Initializable {
     private TableColumn<TableData, Float> totalInterestCol;
 
     private ObservableList<TableData> dataList = FXCollections.observableArrayList();
+    private ObservableList<TableData> newList = FXCollections.observableArrayList();
 
     @FXML
     private LineChart<Number, Number> annuityGraph;
@@ -164,87 +165,143 @@ public class Controller implements Initializable {
 
         // Getting payment delay information.
         Setup setup = new Setup();
-        totalDelay = (delayYearEndInput - delayYearStartInput) * 12 + (delayMonthEndInput - delayMonthStartInput);
-        delayStartMonth = delayYearStartInput * 12 + delayMonthStartInput;
-        delayEndMonth = delayYearEndInput * 12 + delayMonthEndInput;
-        System.out.println("Total delay: " + totalDelay + ", Delay start month: " + delayStartMonth + ", Delay end month: " + delayEndMonth);
+        calculate();
+    }
 
-        // Calculating the total length of time over which the mortgage needs to be repaid in months.
-        int term = Calculations.monthsToRepay();
-        // Setting the starting value of remainingBalance to the total loan amount.
-        remainingBalance = loanAmountInput;
-        // Calculating the monthly interest rate from the provided yearly interest rate.
-        double monthlyInterestRate = interestRateInput / 1200;
+    public void calculate() {
+        int counter = 1;
+        int term = loanTermYearInput * 12 + loanTermMonthInput;
+        double remainingBalance = loanAmountInput;
+        double monthlyInterestRate = interestRateInput / 12 / 100;
+        double monthlyPayment;
+        int postponeStart = delayYearStartInput * 12 + delayMonthStartInput;
+        int postponeEnd = delayYearEndInput * 12 + delayMonthEndInput;
+        double totalToPay = 0;
+        int totalInterest = 0;
+        dataList.clear();
 
-        // Calculating the monthly payment for annuity or linear mortgage, based on the selected mortgage type.
-        if(selectedGraph.equals("Annuity")) {
-            monthlyPayment = (loanAmountInput * monthlyInterestRate) / (1 - pow(1 + monthlyInterestRate, -(term - totalDelay)));
+        if (selectedGraph.equals("Annuity")) {
+            System.out.println("CALCULATING ANNUITY MORTGAGE");
+
+            monthlyPayment = (loanAmountInput * monthlyInterestRate) / (1 - Math.pow((1 + monthlyInterestRate), -term));
+            if (Double.isNaN(monthlyPayment)) {
+                monthlyPayment = loanAmountInput / term;
+            }
+
+            counter = 1;
+            remainingBalance = monthlyPayment * term;
+            double principal = loanAmountInput;
+            double percent;
+
+            for (int i = 1; i <= term; i++) {
+                remainingBalance -= monthlyPayment;
+
+                if (i >= postponeStart && i < postponeEnd && postponeEnd < term) {
+                    monthlyPayment = 0;
+                    counter++;
+                }
+
+                if (postponeEnd == i && i > 1 && postponeEnd < term) {
+                    remainingBalance += remainingBalance * counter * monthlyInterestRate;
+                    monthlyPayment = remainingBalance / (term - i);
+                    principal += principal * monthlyInterestRate;
+                }
+
+                if (principal <= 0) principal = 0;
+                if (remainingBalance < 1) remainingBalance = 0;
+                percent = principal * monthlyInterestRate;
+                principal -= percent;
+
+                double monthlyPaymentRounded = ModifyInput.roundInput(monthlyPayment);
+                double interestPaymentRounded = ModifyInput.roundInput(percent);
+                double remainingBalanceRounded = ModifyInput.roundInput(remainingBalance);
+
+                totalInterest += interestPaymentRounded;
+
+                TableData newData = new TableData(i, (float) monthlyPaymentRounded, (float) interestPaymentRounded, totalInterest, (float) remainingBalanceRounded);
+                dataList.add(newData);
+
+                annuitySeries.getData().add(new XYChart.Data<>(i, monthlyPaymentRounded));
+            }
+            applyFilter();
         } else {
-            monthlyPayment = (loanAmountInput / term) + (loanAmountInput * monthlyInterestRate);
-        }
+            System.out.println("CALCULATING LINEAR MORTGAGE");
 
-        // Loop, going through each month of the mortgage term, calculating the monthly payment, interest payment and remaining balance.
-        for (int i = (int) filterStart.getValue(); i <= (int) (filterEnd.getValue()); i++) {
-            // Calculating the monthly interest in currency.
-            double interestPayment = remainingBalance * monthlyInterestRate;
-            double principalPayment = 0;
-
-            float interestPaymentRounded;
-            float remainingBalanceRounded;
-            float monthlyPaymentRounded;
-
-            if(filterStart.getValue() > 0) {
-                for(int x = 0; x < i; x++) {
-                    System.out.println("Remaining balance: " + remainingBalance + "i: " + i);
-                    remainingBalance -= principalPayment;
-                }
-            }
-
-            // Checking if current month is inside a postpone period.
-            if(i >= delayStartMonth && i < delayEndMonth) {
-                interestPayment = 0;
-                monthlyPaymentRounded = 0;
-            } else {
-                if(selectedGraph.equals("Linear")) {
-                    principalPayment = loanAmountInput / (term - totalDelay);
+            double monthlyReduction = loanAmountInput / term;
+            for (int i = 1; i <= term; i++) {
+                monthlyPayment = monthlyReduction + monthlyInterestRate * remainingBalance;
+                if (i >= postponeStart && i < postponeEnd && postponeEnd < term) {
+                    monthlyPayment = 0;
+                    counter++;
+                } else if (postponeEnd == i && i > 1 && postponeEnd < term) {
+                    remainingBalance += remainingBalance * counter * monthlyInterestRate;
+                    monthlyReduction = remainingBalance / term;
+                    monthlyPayment = monthlyReduction + monthlyInterestRate * remainingBalance;
                 } else {
-                    principalPayment = monthlyPayment;
+                    remainingBalance -= monthlyReduction;
                 }
 
-                if(selectedGraph.equals("Linear")) {
-                    monthlyPaymentRounded = ModifyInput.roundInput(principalPayment + interestPayment);
-                } else monthlyPaymentRounded = ModifyInput.roundInput(monthlyPayment);
-
-                // Checking if on the last month, the remaining balance is lower than the monthly payment calculated.
-//                if(remainingBalance < monthlyPayment) {
-//                    monthlyPaymentRounded = ModifyInput.roundInput(remainingBalance + interestPayment);
-//                    remainingBalance = 0;
-//                } else {
-//                    remainingBalance -= principalPayment;
-//                }
-                remainingBalance -= principalPayment;
-
-                System.out.println("Monthly payment: " + monthlyPaymentRounded + ", Remaining Balance: " + remainingBalance);
+                if (remainingBalance < 1) remainingBalance = 0;
+                totalToPay += monthlyPayment;
             }
 
-            if(remainingBalance < 1) remainingBalance = 0;
+            double percentPay = totalToPay;
+            monthlyReduction = loanAmountInput / term;
+            remainingBalance = loanAmountInput;
+            counter = 1;
+            double percent;
 
-            interestPaymentRounded = ModifyInput.roundInput(interestPayment);
-            remainingBalanceRounded = ModifyInput.roundInput(remainingBalance);
+            for (int i = 1; i <= term; i++) {
+                monthlyPayment = monthlyReduction + monthlyInterestRate * remainingBalance;
+                if (i >= postponeStart && i < postponeEnd && postponeEnd < term) {
+                    monthlyPayment = 0;
+                    counter++;
+                    percent = remainingBalance * monthlyInterestRate;
+                } else if (postponeEnd == i && i > 1 && postponeEnd < term) {
+                    remainingBalance += remainingBalance * counter * monthlyInterestRate;
+                    monthlyReduction = remainingBalance / term;
+                    monthlyPayment = monthlyReduction + monthlyInterestRate * remainingBalance;
+                    percent = remainingBalance * monthlyInterestRate;
+                } else {
+                    percent = remainingBalance * monthlyInterestRate;
+                    remainingBalance -= monthlyReduction;
+                }
 
-            totalInterest += interestPaymentRounded;
-            float totalInterestRounded = ModifyInput.roundInput(totalInterest);
+                totalToPay -= monthlyPayment;
+                if (totalToPay < 1) totalToPay = 0;
 
-            TableData newData = new TableData(i, monthlyPaymentRounded, interestPaymentRounded, totalInterestRounded, remainingBalanceRounded);
-            dataList.add(newData);
-            monthlyTable.setItems(dataList);
-            monthlyTable.refresh();
+                double monthlyPaymentRounded = ModifyInput.roundInput(monthlyPayment);
+                double interestPaymentRounded = ModifyInput.roundInput(percent);
+                double remainingBalanceRounded = ModifyInput.roundInput(totalToPay);
 
-            annuitySeries.getData().add(new XYChart.Data<>(i, monthlyPaymentRounded));
-            linearSeries.getData().add(new XYChart.Data<>(i, monthlyPaymentRounded));
+                totalInterest += interestPaymentRounded;
+
+                TableData newData = new TableData(i, (float) monthlyPaymentRounded, (float) interestPaymentRounded, totalInterest, (float) remainingBalanceRounded);
+                dataList.add(newData);
+                linearSeries.getData().add(new XYChart.Data<>(i, monthlyPaymentRounded));
+            }
         }
 
-        // Adding data collected in the loop to the graphs.
+        applyFilter();
+    }
+
+    public void applyFilter() {
+        System.out.println("Applying filter");
+        cleanUpFromLastIteration();
+        newList.clear();
+
+        // Add the rows that pass the filter to the table
+        for (TableData row : dataList) {
+            int month = row.getMonth();
+
+            if (month >= (int) filterStart.getValue() && month <= (int) filterEnd.getValue()) {
+                annuitySeries.getData().add(new XYChart.Data<>(month, row.getMonthlyPayment()));
+                linearSeries.getData().add(new XYChart.Data<>(month, row.getMonthlyPayment()));
+                newList.add(row);
+                monthlyTable.setItems(newList);
+                monthlyTable.refresh();
+            }
+        }
         annuityGraph.getData().add(annuitySeries);
         linearGraph.getData().add(linearSeries);
     }
@@ -252,9 +309,8 @@ public class Controller implements Initializable {
     private void cleanUpFromLastIteration() {
         linearSeries.getData().clear();
         annuitySeries.getData().clear();
-        dataList.removeAll(dataList);
-        annuityGraph.getData().add(annuitySeries);
-        linearGraph.getData().add(linearSeries);
+//        annuityGraph.getData().add(annuitySeries);
+//        linearGraph.getData().add(linearSeries);
     }
 
     public void getLoanTypeSelection(ActionEvent event) {
